@@ -1,8 +1,14 @@
 import PropTypes from 'prop-types';
+import Button from "./Button.jsx"
 
 function SideBar({ projects, onSelectProject, selectedProjectIndex, onDeleteProject, onAddProject }) {
   return (
-    <div className="top-0 left-0 ml-2 max-h-max max-w-max p-2 flex flex-col rounded-xl bg-gray-400 text-gray-900 dark:bg-neutral-950 dark:text-white shadow-lg">
+    <aside className="w-1/3 px-8 py-16 md:w-72 rounded-xl 
+          bg-gray-400 text-gray-900 dark:bg-neutral-950 dark:text-white shadow-lg">
+      <div className='flex justify-center'>
+        <Button title="+ Add New" onClick={onAddProject} />
+      </div>
+      
       {projects.map((project, index) => (
         <SideBarCell
           key={index}
@@ -12,13 +18,7 @@ function SideBar({ projects, onSelectProject, selectedProjectIndex, onDeleteProj
           onDelete={() => onDeleteProject(index)}
         />
       ))}
-      <button
-        className="p-2 mt-4 bg-blue-500 text-white rounded hover:bg-blue-600"
-        onClick={onAddProject}
-      >
-        Add New Project
-      </button>
-    </div>
+    </aside>
   );
 }
 
@@ -31,24 +31,23 @@ SideBar.propTypes = {
 
 export default SideBar;
 function SideBarCell({ title, isSelected, onClick, onDelete }) {
-    return (
-      <div
-        className={`sidebar-cell font-bold group flex justify-between items-center p-2 ${
-          isSelected ? "bg-blue-500 text-white" : ""
+  return (
+    <div
+      className={`sidebar-cell font-bold group flex justify-between items-center p-2 ${isSelected ? "bg-blue-500 text-white" : ""
         }`}
-        onClick={onClick}
+      onClick={onClick}
+    >
+      <span>{title}</span>
+      <button
+        className="ml-2 text-red-500 hover:text-red-700"
+        onClick={(e) => {
+          e.stopPropagation(); // Prevent triggering onClick for selecting the project
+          onDelete();
+        }}
       >
-        <span>{title}</span>
-        <button
-          className="ml-2 text-red-500 hover:text-red-700"
-          onClick={(e) => {
-            e.stopPropagation(); // Prevent triggering onClick for selecting the project
-            onDelete();
-          }}
-        >
-          Delete
-        </button>
-      </div>
-    );
-  }
-  
+        Delete
+      </button>
+    </div>
+  );
+}
+

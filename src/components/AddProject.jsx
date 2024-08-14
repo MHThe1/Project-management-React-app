@@ -1,42 +1,57 @@
-import { useState } from "react";
+import { useRef } from "react";
+import Input from "./Input.jsx";
 
-export default function AddProject({ onAddProject }) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+import Modal from "./Modal.jsx";
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    onAddProject({ title, description });
-    setTitle("");
-    setDescription("");
+export default function AddProject({ onAdd, onCancel }) {
+
+  const modal = useRef();
+
+  const title = useRef();
+  const description = useRef();
+  const deadline = useRef();
+
+  function handleSave() {
+    const entertedTitle = title.current.value;
+    const entertedDescription = title.current.value;
+    const entertedDeadline = title.current.value;
+
+    if (entertedTitle.trim() === '' || entertedDescription.trim() === '' || entertedDeadline.trim() === '' ) {
+      modal.current.open();
+      return;
+    }
+
+    onAdd({
+      title: entertedTitle,
+      description: entertedDescription,
+      deadline: entertedDeadline,
+    });
   }
 
   return (
-    <div>
-      <p className="mb-4 text-lg font-semibold dark:text-white">Create New Project</p>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input
-          type="text"
-          placeholder="Project Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="p-2 border border-gray-300 rounded-md dark:bg-neutral-800 dark:text-white"
-          required
-        />
-        <textarea
-          placeholder="Project Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="p-2 border border-gray-300 rounded-md dark:bg-neutral-800 dark:text-white"
-          required
-        />
-        <button
-          type="submit"
-          className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-        >
-          Add Project
-        </button>
-      </form>
+    <>
+    <Modal ref={modal} buttonCaption="Okay">
+      <h2 className="text-xl font-bold my-4">Invalid Input</h2>
+      <p className="mb-4">Oops.. did you forget to enter a value!</p>
+      <p className="mb-4">Please make sure to add valid values for all the inputs.</p>
+    </Modal>
+    <div className="w-[35rem] mt-16 mr-5">
+      <menu className="flex items-center justify-end gap-4 my-4">
+        <li>
+          <button 
+            onClick={onCancel}
+            className="text-stone-800 dark:text-stone-200 hover:text-stone-950">Cancel</button>
+        </li>
+      </menu>
+
+      <Input ref={title} required label="Title" />
+      <Input ref={description} required label="Description" textarea />
+      <Input ref={deadline} type="date" required label="Deadline" />
+      <button
+          onClick={handleSave}
+          className="px-6 py-2 rounded-md bg-stone-800 text-stone-50 hover:bg-stone-950">Save</button>
+      
     </div>
+    </>
   );
 }

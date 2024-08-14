@@ -3,6 +3,7 @@ import SideBar from "./components/SideBar";
 import ToggleTheme, { ThemeMode } from "./components/ToggleTheme";
 import AddProject from "./components/AddProject";
 import TaskList from "./components/TaskList";
+import NoProjectSelected from "./components/NoProjectSelected";
 
 export default function App() {
   const [projects, setProjects] = useState([]);
@@ -10,14 +11,12 @@ export default function App() {
   const [isAddingProject, setIsAddingProject] = useState(false);
 
   function handleAddProject(newProject) {
-    const updatedProjects = [
-      ...projects,
-      { ...newProject, tasks: [] },
-    ];
-    setProjects(updatedProjects);
-    setSelectedProjectIndex(updatedProjects.length - 1); // Automatically select the new project
-    setIsAddingProject(false);
+    const projectWithTasks = { ...newProject, tasks: [] }; // Initialize tasks as an empty array
+    setProjects((prevProjects) => [...prevProjects, projectWithTasks]);
+    setSelectedProjectIndex(projects.length); // Automatically select the newly added project
+    setIsAddingProject(false); // Close the AddProject form after adding
   }
+  
 
   function handleSelectProject(index) {
     setSelectedProjectIndex(index);
@@ -48,7 +47,36 @@ export default function App() {
     setProjects(updatedProjects);
   }
 
+  function handleCancel() {
+    setIsAddingProject(false);
+  }
+
   const selectedProject = selectedProjectIndex !== null ? projects[selectedProjectIndex] : null;
+
+
+  let content;
+
+  if (selectedProject && !isAddingProject) {
+    content = (
+      <div className="mt-8 p-4 bg-gray-200 dark:bg-neutral-800 rounded-md">
+        <h2 className="text-2xl font-bold dark:text-white">{selectedProject.title}</h2>
+        <p className="mt-2 dark:text-white">{selectedProject.description}</p>
+        <div className="mt-4">
+          <h3 className="text-xl font-semibold dark:text-white">Tasks</h3>
+          <TaskList
+            tasks={selectedProject.tasks}
+            onToggleTask={handleToggleTask}
+            onAddTask={handleAddTask}
+          />
+        </div>
+      </div>
+    );
+  } else if (isAddingProject === false && selectedProjectIndex === null) { // Corrected && operator
+    content = <NoProjectSelected onAddProject={() => setIsAddingProject(true)} />;
+  } else {
+    content = <AddProject onAdd={handleAddProject} onCancel={handleCancel} />;
+  }
+
 
   return (
     <div className={`${ThemeMode() && "dark"}`}>
@@ -61,7 +89,7 @@ export default function App() {
           <ToggleTheme />
         </nav>
 
-        <div className="flex flex-1">
+        <div className="h-screen flex gap-8">
           <SideBar
             projects={projects}
             onSelectProject={handleSelectProject}
@@ -70,7 +98,9 @@ export default function App() {
             onAddProject={() => setIsAddingProject(true)}
           />
 
-          <div className="p-8 flex-1">
+          {content}
+
+          {/* <div className="p-8 flex-1">
             {isAddingProject || projects.length === 0 ? (
               <AddProject onAddProject={handleAddProject} />
             ) : selectedProject ? (
@@ -89,7 +119,7 @@ export default function App() {
             ) : (
               <p className="text-gray-500 dark:text-gray-400">Select a project</p>
             )}
-          </div>
+          </div> */}
         </div>
       </main>
     </div>
