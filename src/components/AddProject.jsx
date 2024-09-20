@@ -13,8 +13,8 @@ export default function AddProject({ onAdd, onCancel }) {
 
   function handleSave() {
     const entertedTitle = title.current.value;
-    const entertedDescription = title.current.value;
-    const entertedDeadline = title.current.value;
+    const entertedDescription = description.current.value;
+    const entertedDeadline = deadline.current.value;
 
     if (entertedTitle.trim() === '' || entertedDescription.trim() === '' || entertedDeadline.trim() === '' ) {
       modal.current.open();
